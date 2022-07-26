@@ -1,0 +1,17 @@
+/include/ "system-conf.dtsi"
+/ {
+	chosen {
+		bootargs = "earlycon clk_ignore_unused   uio_pdrv_genirq.of_id=generic-uio";
+	};
+};
+ 
+&amba {
+	ptm@f889d000 {
+		cpu = <&cpu0>;
+	};
+};
+
+&SimpleGpio_SimpleGpioSyn_0 {
+	compatible = "generic-uio";
+};
+

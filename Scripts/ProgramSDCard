@@ -1,0 +1,43 @@
+#!/bin/bash 
+#### Copy PetaLinux image (with ext4 rootfs) to specified SD card.
+
+if [ -z "$1" ]; then 
+    echo "Enter the SD Card device to program" 
+    exit 0
+fi
+
+if [ ! -d images/linux ]; then 
+    echo "Check the directory you're in.  I can't run this" 
+    exit 0
+fi
+
+DEV=$1
+
+if [ ! -e ${DEV}1 -o ! -e ${DEV}2 ]; then
+    echo "SD Card not properly partitioned" 
+    ls -ald ${DEV}*
+    exit 0 
+fi 
+
+## Unmount all ext partitions (Which just happen to have names at least 16 characters)
+echo "Unmount rootfs, DD to ${DEV}2"
+ROOTFSDEV=`ls /media/${USER}/?????????????????* -d`
+if [ -n "$ROOTFSDEV" ]; then 
+    for partition in $ROOTFSDEV; do 
+        sudo umount $partition
+    done 
+fi 
+
+sudo dd if=images/linux/rootfs.ext4 of=${DEV}2 bs=16k
+sudo resize2fs ${DEV}2
+
+FILELOC=`mount | grep ${DEV}1 | xargs | cut -d ' ' -f 3`
+
+echo "Copying files to $FILELOC"
+
+cp -v images/linux/image.ub $FILELOC
+cp -v images/linux/BOOT.BIN $FILELOC 
+cp -v images/linux/boot.scr $FILELOC 
+
+sudo eject ${DEV}
+

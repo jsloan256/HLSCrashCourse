@@ -1,0 +1,62 @@
+#! /bin/bash 
+#################################################################
+#   Script to partition SD cards for use with Xilinx petalinux
+#   designs
+
+if [ -z "$1" ]; then 
+	echo "Usgage $0 <SD Card Partition>"
+	echo "Specify a partition to prepare, e.g. /dev/sdb"
+	exit 1
+fi
+
+echo "Partition SD Card for SW"
+
+PARTBASE=$1
+
+if [ 0 -lt `echo ${PARTBASE} | grep mmcblk | wc -l` ]; then 
+	echo "MMC Device"
+	PARTPREFIX=${PARTBASE}p
+else 
+	echo "Standard Disk Device"
+	PARTPREFIX=${PARTBASE}
+fi 
+BASECOUNT=`echo ${PARTPREFIX} | wc -c`
+
+PARTLIST=`ls ${PARTBASE}* | xargs`
+
+### Remove existing partitions from the card 
+for PART in ${PARTLIST}; do
+	if [ "${PARTBASE}" = "${PART}" ]; then 
+		##echo "This is the partition Base: ${PART}"
+		continue
+	else 
+                if [ 0 -lt `mount | grep ${PART} | wc -l` ]; then 
+                    echo "Unmount ${PART}"
+                    sudo umount ${PART}
+                fi 
+		echo "Deleting ${PART}"
+		PARTNUM=`echo ${PART} | cut -c ${BASECOUNT}-100`
+		echo "sudo parted ${PARTBASE} rm ${PARTNUM}"
+		sudo parted ${PARTBASE} rm ${PARTNUM}
+	fi
+done 
+
+echo "Current List"
+ls ${PARTBASE}*
+
+echo "Now to Add partitions"
+sudo parted ${PARTBASE} mkpart primary fat32 40 3112
+sudo parted ${PARTBASE} mkpart primary ext4 3153 6225
+sudo parted ${PARTBASE} mkpart primary ext4 6226 8274
+
+
+sleep 2
+echo "New List: (${PARTPREFIX}x)"
+ls ${PARTBASE}*
+
+echo "Formatting the partitions"
+sudo mkfs.fat ${PARTPREFIX}1
+sudo mkfs.ext4 ${PARTPREFIX}2
+sudo mkfs.ext4 ${PARTPREFIX}3
+
+sudo parted --list 
