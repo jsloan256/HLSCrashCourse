@@ -36,6 +36,7 @@ Verify that JP2 is installed. Connect the SD card to your PC and find its mount 
 
 Run
 * `HCCLinux$ ../Scripts/PartitionSDCard /dev/sdX`
+* Remove and reinstall SD card into PC
 * `HCCLinux$ ../Scripts/ProgramSDCard /dev/sdX`
 
 Open a serial terminal and log into linux using `petalinux` as the username.
