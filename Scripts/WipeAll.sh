@@ -2,3 +2,4 @@
 ./WipeVivadoProject.sh
 ./WipeHLS.sh
 ./WipeNP.sh
+./WipeLinux.sh

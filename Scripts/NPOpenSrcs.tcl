@@ -7,9 +7,6 @@ set_property ip_repo_paths $IpRepos [current_project]
 if {[info exists BoardName]} {
   set_property "board_part" $BoardName [current_project]
 }
-if {[info exists TMFolder]} {
-  read_vhdl -library work [glob $TMFolder/*.vhd]
-}
 
 update_ip_catalog
 
