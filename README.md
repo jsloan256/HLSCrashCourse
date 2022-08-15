@@ -1,4 +1,5 @@
-# HLS Crash Course firmware and software
+# HLSCrashCourse
+This project demonstrates the HLS cores from the core itself, adding the core to a Vivado project, and using the core in petalinux.
 
 # Required Tools for Firmware (Vivado) compilation
 * Xilinx Vivado 2022.1
@@ -11,11 +12,17 @@ A docker configuration is available at https://github.com/jsloan256/xilinx-docke
 ## Target
 * [Digilent CoraZ7-07S](https://reference.digilentinc.com/programmable-logic/cora-z7/start?redirect=1)
 
-# Vivado project restoration
+# Vivado project
+## Restoring the Vivado project
 Perform the following steps to regenerate the Vivado top-level project as well as any Vivado HLS IP core projects. Vivado project restoration is not required for Matlab simulation.
 
 * Change to the Scripts folder in project directory (ie. /HLSCrashCourse/Scripts)
 * Run: `Scripts$ ./RestoreAll.sh`
+
+## Building the Vivado project from the command line
+* Run: `Scripts$ ./GenerateXSA.sh`
+
+## Building the Vivado project in the GUI
 * Open Vivado/HLSCrashCourse.xpr in Vivado 2022.1
 * Run **Generate Bitstream** from the Vivado Flow Navigator window pane
 * Run `source Scripts/ExportXSA.tcl` from the Vivado TCL window
