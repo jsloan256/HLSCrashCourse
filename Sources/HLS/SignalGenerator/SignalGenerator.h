@@ -7,13 +7,27 @@
 #include <hls_stream.h>
 #include <ap_axi_sdata.h>
 #include <hls_math.h>
-#include <utils/x_hls_traits.h>
-#include "Types.h"
+#include "SignalGeneratorStructs.h"
 
-void SignalGeneratorControlSyn(SignalGeneratorControlRegistersT<float,uint32_t>* AXI4Control, SignalGeneratorControlRegistersT<FixedPointT,ap_uint<1> >* Control);
-void SignalGeneratorSyn(SignalGeneratorControlRegistersT<FixedPointT,ap_uint<1> >* Control, hls::stream<DA3AXIS>& Output);
+#define FP_TYPES  // Define to use fixed-point types. Un-define to use floats
 
-// #define SAMPLE_PERIOD 0.0000000078125
+#ifdef FP_TYPES
+  #define FLT( var ) var.to_float()
+  #define UINT( var ) var.to_uint()
+  typedef ap_fixed<16, 4> FixedPointT;
+//   typedef ap_fixed<16, 4, AP_RND, AP_SAT> FixedPointSatT;
+  typedef ap_fixed<16, 4> FixedPointSatT;     // TODO: Improve behavior when Control-Vpp
+                                              // saturates (line above causes odd behavior)
+#else
+  #define FLT( var ) var
+  #define UINT( var ) var
+  typedef float FixedPointT;
+  typedef float FixedPointSatT;
+#endif
+
+#define DA3_W 16              // Digilent PA3 has a 16 bit ADC
+typedef hls::axis<ap_uint<DA3_W>,0,0,0> DA3AXIS;
+
 #define SAMPLE_FREQUENCY 128000000.f
 #define VREF             2.5f
 #define COUNT_PER_VOLT   65535.f / VREF     // 65535 because ADC is 16 bit
@@ -22,6 +36,8 @@ void SignalGeneratorSyn(SignalGeneratorControlRegistersT<FixedPointT,ap_uint<1> 
 
 #define RADIAN_SREG_LENGTH  2
 #define FRAMESIZE           16
+
+void SignalGeneratorSyn(SignalGeneratorControlRegistersT<FixedPointT,ap_uint<1> >* Control, hls::stream<DA3AXIS>& Output);
 
 class SignalGenerator
 {

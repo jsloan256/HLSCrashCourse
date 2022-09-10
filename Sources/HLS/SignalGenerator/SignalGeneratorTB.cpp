@@ -1,17 +1,11 @@
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <complex>
-#include <hls_stream.h>
-#include <ap_axi_sdata.h>
 #include "SignalGenerator.h"
 
 #define SIMULATION_LENGTH 128
 
-void CalculateSignalGeneratorControlRegisters(float Frequency, float Power, SignalGeneratorControlRegistersT<float,uint32_t>* AXI4Control)
+void CalculateSignalGeneratorControlRegisters(float Frequency, float Power, SignalGeneratorControlRegistersT<float, uint32_t>* AXI4Control)
 {
-  float Vpp;
-  float RadiansPerSample;
+//   float Vpp;
+//   float RadiansPerSample;
 
   // Convert power in dBm to volts
   AXI4Control->Vpp = 2.f * sqrt(2.f) * sqrt(pow(10.f, Power/10.f) / 20.f);
@@ -32,8 +26,9 @@ int main()
   int i;
   int err = 0;
   SignalGeneratorControlRegistersT<float,uint32_t> AXI4Control;
-  SignalGeneratorControlRegistersT<FixedPointT,ap_uint<1> > Control;
+  SignalGeneratorControlRegistersT<FixedPointT, ap_uint<1> > Control;
   hls::stream<DA3AXIS> Output;
+  DA3AXIS OutVal;
   #pragma HLS STREAM variable=Output depth=SIMULATION_LENGTH
 
   float Frequency = 4000000.f;      // 4 MHz
@@ -41,7 +36,9 @@ int main()
 
   CalculateSignalGeneratorControlRegisters(Frequency, Power, &AXI4Control);
 
-  SignalGeneratorControlSyn(&AXI4Control, &Control);
+  // Convert AXIControl regsiters to Control registers (from 32bit ANSI types to HLS types)
+  Control.RadiansPerSample = (FixedPointT) AXI4Control.RadiansPerSample;
+  Control.Vpp              = (FixedPointT) AXI4Control.Vpp;
 
   printf("\nRunning UUT\n");
   for (i=0; i<SIMULATION_LENGTH/FRAMESIZE; i++)
@@ -50,6 +47,12 @@ int main()
   }
 
   // TODO: Add output data checking
+  printf("OutVal\n");
+  while (!Output.empty())
+  {
+    OutVal = Output.read();
+    printf("%d\n", UINT( OutVal.data ));
+  }
 
   err = 0;
 

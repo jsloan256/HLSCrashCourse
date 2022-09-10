@@ -3,7 +3,7 @@ set_top SignalGeneratorSyn
 add_files SignalGeneratorSyn.cpp
 add_files SignalGenerator.cpp
 add_files -tb SignalGeneratorTB.cpp
-add_files -tb SignalGeneratorControlSyn.cpp
+#add_files -tb SignalGeneratorControlSyn.cpp
 
 puts "=================================================================="
 puts " Creating Solution "
