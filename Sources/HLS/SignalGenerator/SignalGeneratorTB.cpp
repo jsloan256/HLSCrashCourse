@@ -2,22 +2,24 @@
 
 #define SIMULATION_LENGTH 128
 
-void CalculateSignalGeneratorControlRegisters(float Frequency, float Power, SignalGeneratorControlRegistersT<float, uint32_t>* AXI4Control)
+void CalculateSignalGeneratorControlRegisters(float Frequency, float Vp, SignalGeneratorControlRegistersT<float, uint32_t>* AXI4Control)
 {
-//   float Vpp;
-//   float RadiansPerSample;
-
-  // Convert power in dBm to volts
-  AXI4Control->Vpp = 2.f * sqrt(2.f) * sqrt(pow(10.f, Power/10.f) / 20.f);
+  AXI4Control->Vp = Vp;
   AXI4Control->RadiansPerSample = ((Frequency / SAMPLE_FREQUENCY) * M_PI);
 
-  printf("Setting power to %f dBm (%f Vpp)\n", Power, AXI4Control->Vpp);
+  printf("Setting Vp to %f\n", Vp, AXI4Control->Vp);
   printf("Setting frequency to %f Hz (%f RadiansPerSample)\n", Frequency, AXI4Control->RadiansPerSample);
 
-  if (AXI4Control->Vpp > VREF/2.f)
+  // Set maximum Vp based on ap_fixed type's I (SigGenInteger)
+  if (AXI4Control->Vp < 0)
   {
-    AXI4Control->Vpp = VREF / 2.f;
-    printf("Capping Vpp to VREF/2: %f\n", AXI4Control->Vpp);
+    AXI4Control->Vp = 1.f;
+    printf("Tried to set Vp to a negative failure, forced to one: %f\n", AXI4Control->Vp);
+  }
+  else if (AXI4Control->Vp > pow(2, (SigGenInteger-1)))
+  {
+    AXI4Control->Vp = pow(2, (SigGenInteger-1));
+    printf("Capping Vp to 2^(SigGenInteger-1): %f\n", AXI4Control->Vp);
   }
 }
 
@@ -26,19 +28,19 @@ int main()
   int i;
   int err = 0;
   SignalGeneratorControlRegistersT<float,uint32_t> AXI4Control;
-  SignalGeneratorControlRegistersT<FixedPointT, ap_uint<1> > Control;
-  hls::stream<DA3AXIS> Output;
-  DA3AXIS OutVal;
+  SignalGeneratorControlRegistersT<SigGenT, ap_uint<1> > Control;
+  hls::stream<SigGenAXIS> Output;
+  SigGenAXIS OutVal;
   #pragma HLS STREAM variable=Output depth=SIMULATION_LENGTH
 
-  float Frequency = 4000000.f;      // 4 MHz
-  float Power = 6.f;                // 6 dBm;
+  float Frequency = 4000000.f;  // 4 MHz
+  float Vp = 6.f;               // Range will be -6.0 to 6.0
 
-  CalculateSignalGeneratorControlRegisters(Frequency, Power, &AXI4Control);
+  CalculateSignalGeneratorControlRegisters(Frequency, Vp, &AXI4Control);
 
-  // Convert AXIControl regsiters to Control registers (from 32bit ANSI types to HLS types)
-  Control.RadiansPerSample = (FixedPointT) AXI4Control.RadiansPerSample;
-  Control.Vpp              = (FixedPointT) AXI4Control.Vpp;
+  // Convert AXIControl registers to Control registers (from 32bit ANSI types to HLS types)
+  Control.RadiansPerSample = (SigGenT) AXI4Control.RadiansPerSample;
+  Control.Vp               = (SigGenT) AXI4Control.Vp;
 
   printf("\nRunning UUT\n");
   for (i=0; i<SIMULATION_LENGTH/FRAMESIZE; i++)
@@ -51,8 +53,15 @@ int main()
   while (!Output.empty())
   {
     OutVal = Output.read();
-    printf("%d\n", UINT( OutVal.data ));
+    printf("%f\n", OutVal.data.to_float());
   }
+
+  SigGenT temp;
+
+  temp.range() = 0x8000;
+  printf("temp = %f\n", temp.to_float());
+  temp.range() = 0x7FFF;
+  printf("temp = %f\n", temp.to_float());
 
   err = 0;
 

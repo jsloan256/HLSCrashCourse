@@ -1,6 +1,5 @@
 #include "SignalGenerator.h"
 
-// TODO: Add constructor argument (RadiansPerSample) to better initialize the shift register
 SignalGenerator::SignalGenerator()
 {
   int Ndx;
@@ -11,20 +10,16 @@ SignalGenerator::SignalGenerator()
   }
 }
 
-void SignalGenerator::CalculateNextSample(SignalGeneratorControlRegistersT<FixedPointT,ap_uint<1> >* Control, hls::stream<DA3AXIS>& Output)
+void SignalGenerator::CalculateNextSample(SignalGeneratorControlRegistersT<SigGenT,ap_uint<1> >* Control, hls::stream<SigGenAXIS>& Output)
 {
   int Ndx;
-  DA3AXIS OutVal;
-  FixedPointT CurrentRadian;
-  FixedPointT NextRadian;
-  FixedPointT NextRadianLimited;
-  FixedPointT CountPerVolt = COUNT_PER_VOLT;
-  FixedPointT Pi = M_PI;
-  FixedPointT TwoPi = 2 * M_PI;
-  FixedPointT DCOffset = DC_OFFSET;
-  FixedPointT SineResult;
-  FixedPointSatT OutputVoltage;
-  FixedPointSatT OutputCount;
+  SigGenAXIS OutVal;
+  SigGenT CurrentRadian;
+  SigGenT NextRadian;
+  SigGenT NextRadianLimited;
+  SigGenT Pi = M_PI;
+  SigGenT TwoPi = 2 * M_PI;
+  SigGenT SineResult;
 
   #pragma HLS ARRAY_PARTITION variable=RadianShiftRegister complete dim=1
 
@@ -35,10 +30,9 @@ void SignalGenerator::CalculateNextSample(SignalGeneratorControlRegistersT<Fixed
     // Pull oldest Radian value from shift register
     CurrentRadian = RadianShiftRegister[1];
 
+    // Calculate the new output value
     SineResult = hls::sin(CurrentRadian);
-    OutputVoltage = Control->Vpp * SineResult + DCOffset;
-    OutputCount = OutputVoltage * CountPerVolt;
-    OutVal.data = OutputCount.range();
+    OutVal.data = Control->Vp * SineResult;
 
     // Calculate the next radian value using the value calculated last time
     NextRadian = RadianShiftRegister[0] + Control->RadiansPerSample;
@@ -54,10 +48,6 @@ void SignalGenerator::CalculateNextSample(SignalGeneratorControlRegistersT<Fixed
 
     RadianShiftRegister[1] = RadianShiftRegister[0];
     RadianShiftRegister[0] = NextRadianLimited;
-
-//     printf("CurrentRadian = %f\n", FLT(CurrentRadian));
-//     printf("OutputVoltage = %f\n", FLT(OutputVoltage));
-//     printf("OutVal.data = %s\n", OutVal.data.to_string(16).c_str());
 
     Output.write(OutVal);
   }

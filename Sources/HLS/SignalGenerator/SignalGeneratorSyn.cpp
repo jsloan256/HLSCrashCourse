@@ -1,6 +1,6 @@
 #include "SignalGenerator.h"
 
-void SignalGeneratorSyn(SignalGeneratorControlRegistersT<FixedPointT,ap_uint<1> >* Control, hls::stream<DA3AXIS>& Output)
+void SignalGeneratorSyn(SignalGeneratorControlRegistersT<SigGenT,ap_uint<1> >* Control, hls::stream<SigGenAXIS>& Output)
 {
   #pragma HLS DATAFLOW
   #pragma HLS INTERFACE ap_none register port=Control
