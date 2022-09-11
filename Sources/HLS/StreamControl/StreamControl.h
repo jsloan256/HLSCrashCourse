@@ -3,9 +3,14 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "StreamControlIfStructs.h"
+#include <random>
+#include <hls_stream.h>
+#include <ap_axi_sdata.h>
+#include <hls_math.h>
 
-void StreamControlSyn(StreamControlControlRegistersT* AXI4Control, StreamControlControlRegistersT* Control,
-                   StreamControlStatusRegistersT* AXI4Status, StreamControlStatusRegistersT* Status);
+#include "../SignalGenerator/SignalGeneratorTypes.h"
+
+void StreamControlSyn(SignalGeneratorControlRegistersT<float, uint32_t>* AXI4Control1, SignalGeneratorControlRegistersT<OutputT, ap_uint<1> >* Control1,
+                      SignalGeneratorControlRegistersT<float, uint32_t>* AXI4Control2, SignalGeneratorControlRegistersT<OutputT, ap_uint<1> >* Control2);
 
 #endif

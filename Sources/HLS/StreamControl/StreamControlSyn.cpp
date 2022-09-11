@@ -1,25 +1,25 @@
 #include "StreamControl.h"
 
-void StreamControlSyn(StreamControlControlRegistersT* AXI4Control, StreamControlControlRegistersT* Control,
-                   StreamControlStatusRegistersT* AXI4Status, StreamControlStatusRegistersT* Status)
+void StreamControlSyn(SignalGeneratorControlRegistersT<float, uint32_t>* AXI4Control1, SignalGeneratorControlRegistersT<OutputT, ap_uint<1> >* Control1,
+                      SignalGeneratorControlRegistersT<float, uint32_t>* AXI4Control2, SignalGeneratorControlRegistersT<OutputT, ap_uint<1> >* Control2)
 {
-#pragma HLS DATAFLOW
+  #pragma HLS DATAFLOW
 
-#pragma HLS INTERFACE s_axilite register port=AXI4Control bundle=AXI4Bus
-#pragma HLS INTERFACE ap_none register port=Control
-#pragma HLS disaggregate variable=Control
+  #pragma HLS INTERFACE s_axilite register port=AXI4Control1 bundle=AXI4Bus
+  #pragma HLS INTERFACE ap_none register port=Control1
+  #pragma HLS disaggregate variable=Control1
 
-#pragma HLS INTERFACE s_axilite register port=AXI4Status bundle=AXI4Bus
-#pragma HLS INTERFACE ap_none register port=Status
-#pragma HLS disaggregate variable=Status
+  #pragma HLS INTERFACE s_axilite register port=AXI4Control2 bundle=AXI4Bus
+  #pragma HLS INTERFACE ap_none register port=Control2
+  #pragma HLS disaggregate variable=Control2
 
-  // Set output Control register output ports from the AXI4 Control Registers
-  Control->Register1 = AXI4Control->Register1;
-  Control->Register2 = AXI4Control->Register2;
-  Control->Register3 = AXI4Control->Register3;
+  // Set output Control ports from the AXI4 Control registers (for SignalGenerator core #1)
+  Control1->RadiansPerSample  = AXI4Control1->RadiansPerSample;
+  Control1->Vp                = AXI4Control1->Vp;
+  Control1->StartSG           = AXI4Control1->StartSG;
 
-  // Set AXI4 Status registers from the Status register port inputs
-  AXI4Status->Register1 = Status->Register1;
-  AXI4Status->Register2 = Status->Register2;
-  AXI4Status->Register3 = Status->Register3;
+  // Set output Control ports from the AXI4 Control registers (for SignalGenerator core #2)
+  Control2->RadiansPerSample  = AXI4Control2->RadiansPerSample;
+  Control2->Vp                = AXI4Control2->Vp;
+  Control2->StartSG           = AXI4Control2->StartSG;
 }
