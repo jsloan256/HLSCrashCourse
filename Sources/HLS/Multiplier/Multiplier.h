@@ -4,35 +4,34 @@
 #include <stdio.h>
 #include <string.h>
 #include <complex>
+#include <random>
 #include <hls_stream.h>
 #include <ap_axi_sdata.h>
 #include <hls_math.h>
-#include "MultiplierStructs.h"
 
-#define FP_TYPES  // Define to use fixed-point types. Un-define to use floats
+#define FRAMESIZE    16
+#define INPUT_WIDTH   16
+#define INPUT_INTEGER 4   // Integer portion of Multiplier output data type.
+                          // INPUT_INTEGER includes the sign, so the value range
+                          // is -2^(INPUT_INTEGER-1) to 2^(INPUT_INTEGER-1)
 
-#define SigGenWidth   16
-#define SigGenInteger 4   // Integer portion of Multiplier output data type.
-                          // SigGenInteger includes the sign, so the value range
-                          // is -2^(SigGenInteger-1) to 2^(SigGenInteger-1)
+typedef ap_fixed<INPUT_WIDTH, INPUT_INTEGER> InputT;
+typedef hls::axis<InputT,0,0,0> InputAXIS;
 
-typedef ap_fixed<SigGenWidth, SigGenInteger> SigGenT;
-typedef hls::axis<SigGenT,0,0,0> SigGenAXIS;
+// Let HLS calculate the correct output bit width (and number of integer bits) based on
+// the input type sizes and the operation to be performed
+typedef typename hls::x_traits<InputT, InputT>::ADD_T OutputT;
+typedef hls::axis<OutputT,0,0,0> OutputAXIS;
 
-#define SAMPLE_FREQUENCY    128000000.f
-#define RADIAN_SREG_LENGTH  2
-#define FRAMESIZE           16
-
-void MultiplierSyn(MultiplierControlRegistersT<SigGenT,ap_uint<1> >* Control, hls::stream<SigGenAXIS>& Output);
+void MultiplierSyn(hls::stream<InputAXIS>& Input1, hls::stream<InputAXIS>& Input2, hls::stream<OutputAXIS>& Output);
 
 class Multiplier
 {
   public:
     Multiplier();
-    void CalculateNextSample(MultiplierControlRegistersT<SigGenT,ap_uint<1> >* Control, hls::stream<SigGenAXIS>& Output);
+    void DoMultiplication(hls::stream<InputAXIS>& Input1, hls::stream<InputAXIS>& Input2, hls::stream<OutputAXIS>& Output);
 
   private:
-    SigGenT RadianShiftRegister[RADIAN_SREG_LENGTH];
 };
 
 #endif

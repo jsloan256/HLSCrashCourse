@@ -2,52 +2,24 @@
 
 Multiplier::Multiplier()
 {
-  int Ndx;
-
-  for (Ndx=0; Ndx<RADIAN_SREG_LENGTH; Ndx++)
-  {
-    RadianShiftRegister[Ndx] = 0.f;
-  }
 }
 
-void Multiplier::CalculateNextSample(MultiplierControlRegistersT<SigGenT,ap_uint<1> >* Control, hls::stream<SigGenAXIS>& Output)
+void Multiplier::DoMultiplication(hls::stream<InputAXIS>& Input1, hls::stream<InputAXIS>& Input2, hls::stream<OutputAXIS>& Output)
 {
   int Ndx;
-  SigGenAXIS OutVal;
-  SigGenT CurrentRadian;
-  SigGenT NextRadian;
-  SigGenT NextRadianLimited;
-  SigGenT Pi = M_PI;
-  SigGenT TwoPi = 2 * M_PI;
-  SigGenT SineResult;
+  InputAXIS InVal1;
+  InputAXIS InVal2;
+  OutputAXIS OutVal;
 
-  #pragma HLS ARRAY_PARTITION variable=RadianShiftRegister complete dim=1
-
-  CalculateNextSampleLoop: for (Ndx=0; Ndx<FRAMESIZE; Ndx++)
+  CalculateNextResult: for (Ndx=0; Ndx<FRAMESIZE; Ndx++)
   {
     #pragma HLS PIPELINE II=1 REWIND
+    #pragma HLS BIND_OP variable=OutVal op=mul latency=3
 
-    // Pull oldest Radian value from shift register
-    CurrentRadian = RadianShiftRegister[1];
+    InVal1 = Input1.read();
+    InVal2 = Input2.read();
 
-    // Calculate the new output value
-    SineResult = hls::sin(CurrentRadian);
-    OutVal.data = Control->Vp * SineResult;
-
-    // Calculate the next radian value using the value calculated last time
-    NextRadian = RadianShiftRegister[0] + Control->RadiansPerSample;
-
-    if (NextRadian > TwoPi)
-    {
-      NextRadianLimited = NextRadian - TwoPi;
-    }
-    else
-    {
-      NextRadianLimited = NextRadian;
-    }
-
-    RadianShiftRegister[1] = RadianShiftRegister[0];
-    RadianShiftRegister[0] = NextRadianLimited;
+    OutVal.data = InVal1.data * InVal2.data;
 
     Output.write(OutVal);
   }

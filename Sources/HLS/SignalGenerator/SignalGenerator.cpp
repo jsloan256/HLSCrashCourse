@@ -10,16 +10,16 @@ SignalGenerator::SignalGenerator()
   }
 }
 
-void SignalGenerator::CalculateNextSample(SignalGeneratorControlRegistersT<SigGenT,ap_uint<1> >* Control, hls::stream<SigGenAXIS>& Output)
+void SignalGenerator::CalculateNextSample(SignalGeneratorControlRegistersT<OutputT,ap_uint<1> >* Control, hls::stream<OutputAXIS>& Output)
 {
   int Ndx;
-  SigGenAXIS OutVal;
-  SigGenT CurrentRadian;
-  SigGenT NextRadian;
-  SigGenT NextRadianLimited;
-  SigGenT Pi = M_PI;
-  SigGenT TwoPi = 2 * M_PI;
-  SigGenT SineResult;
+  OutputAXIS OutVal;
+  OutputT CurrentRadian;
+  OutputT NextRadian;
+  OutputT NextRadianLimited;
+  OutputT Pi = M_PI;
+  OutputT TwoPi = 2 * M_PI;
+  OutputT SineResult;
 
   #pragma HLS ARRAY_PARTITION variable=RadianShiftRegister complete dim=1
 
