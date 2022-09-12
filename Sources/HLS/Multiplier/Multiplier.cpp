@@ -4,12 +4,12 @@ Multiplier::Multiplier()
 {
 }
 
-void Multiplier::DoMultiplication(hls::stream<InputAXIS>& Input1, hls::stream<InputAXIS>& Input2, hls::stream<OutputAXIS>& Output)
+void Multiplier::DoMultiplication(hls::stream<MultInputAXIS>& Input1, hls::stream<MultInputAXIS>& Input2, hls::stream<MultOutputAXIS>& Output)
 {
   int Ndx;
-  InputAXIS InVal1;
-  InputAXIS InVal2;
-  OutputAXIS OutVal;
+  MultInputAXIS InVal1;
+  MultInputAXIS InVal2;
+  MultOutputAXIS OutVal;
 
   CalculateNextResult: for (Ndx=0; Ndx<FRAMESIZE; Ndx++)
   {

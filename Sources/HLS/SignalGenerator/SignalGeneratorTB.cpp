@@ -10,16 +10,16 @@ void CalculateSignalGeneratorControlRegisters(float Frequency, float Vp, SignalG
   printf("Setting Vp to %f\n", Vp, AXI4Control->Vp);
   printf("Setting frequency to %f Hz (%f RadiansPerSample)\n", Frequency, AXI4Control->RadiansPerSample);
 
-  // Set maximum Vp based on ap_fixed type's I (OUTPUT_INTEGER)
+  // Set maximum Vp based on ap_fixed type's I (SIGGEN_OUTPUT_INTEGER)
   if (AXI4Control->Vp < 0)
   {
     AXI4Control->Vp = 1.f;
     printf("Tried to set Vp to a negative failure, forced to one: %f\n", AXI4Control->Vp);
   }
-  else if (AXI4Control->Vp > pow(2, (OUTPUT_INTEGER-1)))
+  else if (AXI4Control->Vp > pow(2, (SIGGEN_OUTPUT_INTEGER-1)))
   {
-    AXI4Control->Vp = pow(2, (OUTPUT_INTEGER-1));
-    printf("Capping Vp to 2^(OUTPUT_INTEGER-1): %f\n", AXI4Control->Vp);
+    AXI4Control->Vp = pow(2, (SIGGEN_OUTPUT_INTEGER-1));
+    printf("Capping Vp to 2^(SIGGEN_OUTPUT_INTEGER-1): %f\n", AXI4Control->Vp);
   }
 }
 
@@ -28,9 +28,9 @@ int main()
   int err = 0;
   int Ndx;
   SignalGeneratorControlRegistersT<float,uint32_t> AXI4Control;
-  SignalGeneratorControlRegistersT<OutputT, ap_uint<1> > Control;
-  hls::stream<OutputAXIS> Output;
-  OutputAXIS OutVal;
+  SignalGeneratorControlRegistersT<SigGenOutputT, ap_uint<1> > Control;
+  hls::stream<SigGenOutputAXIS> Output;
+  SigGenOutputAXIS OutVal;
   #pragma HLS STREAM variable=Output depth=SIMULATION_LENGTH
   int PeakNdx1 = 0;
   int PeakNdx2 = 0;
@@ -44,8 +44,8 @@ int main()
   CalculateSignalGeneratorControlRegisters(Frequency, Vp, &AXI4Control);
 
   // Convert AXIControl registers to Control registers (from 32bit ANSI types to HLS types)
-  Control.RadiansPerSample = (OutputT) AXI4Control.RadiansPerSample;
-  Control.Vp               = (OutputT) AXI4Control.Vp;
+  Control.RadiansPerSample = (SigGenOutputT) AXI4Control.RadiansPerSample;
+  Control.Vp               = (SigGenOutputT) AXI4Control.Vp;
 
   printf("\nRunning UUT\n");
   for (Ndx=0; Ndx<SIMULATION_LENGTH/FRAMESIZE; Ndx++)

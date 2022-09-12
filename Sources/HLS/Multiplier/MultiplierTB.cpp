@@ -6,29 +6,29 @@ int main()
 {
   int err = 0;
   int Ndx;
-  hls::stream<InputAXIS> Input1;
-  InputAXIS InVal1;
-  hls::stream<InputAXIS> Input2;
-  InputAXIS InVal2;
-  hls::stream<OutputAXIS> Output;
-  OutputAXIS OutVal;
+  hls::stream<MultInputAXIS> Input1;
+  MultInputAXIS InVal1;
+  hls::stream<MultInputAXIS> Input2;
+  MultInputAXIS InVal2;
+  hls::stream<MultOutputAXIS> Output;
+  MultOutputAXIS OutVal;
   #pragma HLS STREAM variable=Input1 depth=SIMULATION_LENGTH
   #pragma HLS STREAM variable=Input2 depth=SIMULATION_LENGTH
   #pragma HLS STREAM variable=Output depth=SIMULATION_LENGTH
 
-  OutputT OutRef[SIMULATION_LENGTH];
+  MultOutputT OutRef[SIMULATION_LENGTH];
 
   // A fixed seed is REQUIRED. If you don't provide one the reference data generated during csim (c++)
   // will not match the data generated during cosim (verilog)
   std::default_random_engine gen{0xdeadbeef};
   // Set random data range based on the max and min input integer values
-  // (eg. -8 to 8 for INPUT_INTEGER = 4)
-  std::uniform_real_distribution<> dist(-pow(2, (INPUT_INTEGER-1)), pow(2, (INPUT_INTEGER-1)));
+  // (eg. -8 to 8 for MULT_INPUT_INTEGER = 4)
+  std::uniform_real_distribution<> dist(-pow(2, (MULT_INPUT_INTEGER-1)), pow(2, (MULT_INPUT_INTEGER-1)));
   for (Ndx=0; Ndx<SIMULATION_LENGTH; Ndx++)
   {
     // Load Input1 and Input2 with random data
-    InVal1.data = (InputT) dist(gen);
-    InVal2.data = (InputT) dist(gen);
+    InVal1.data = (MultInputT) dist(gen);
+    InVal2.data = (MultInputT) dist(gen);
 
     Input1.write(InVal1);
     Input2.write(InVal2);

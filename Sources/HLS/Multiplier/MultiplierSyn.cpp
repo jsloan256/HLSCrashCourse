@@ -1,6 +1,6 @@
 #include "Multiplier.h"
 
-void MultiplierSyn(hls::stream<InputAXIS>& Input1, hls::stream<InputAXIS>& Input2, hls::stream<OutputAXIS>& Output)
+void MultiplierSyn(hls::stream<MultInputAXIS>& Input1, hls::stream<MultInputAXIS>& Input2, hls::stream<MultOutputAXIS>& Output)
 {
   #pragma HLS DATAFLOW
   #pragma HLS INTERFACE axis register port=Input1

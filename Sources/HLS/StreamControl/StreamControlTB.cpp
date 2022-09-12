@@ -6,20 +6,20 @@ int main()
 {
   int i;
   int err = 0;
-  float OutputResolution = pow(2, -(OUTPUT_WIDTH - OUTPUT_INTEGER));
+  float OutputResolution = pow(2, -(SIGGEN_OUTPUT_WIDTH - SIGGEN_OUTPUT_INTEGER));
 
   SignalGeneratorControlRegistersT<float, uint32_t> AXI4Control1;
-  SignalGeneratorControlRegistersT<OutputT, ap_uint<1> > Control1;
+  SignalGeneratorControlRegistersT<SigGenOutputT, ap_uint<1> > Control1;
 
   SignalGeneratorControlRegistersT<float, uint32_t> AXI4Control2;
-  SignalGeneratorControlRegistersT<OutputT, ap_uint<1> > Control2;
+  SignalGeneratorControlRegistersT<SigGenOutputT, ap_uint<1> > Control2;
 
   // A fixed seed is REQUIRED. If you don't provide one the reference data generated during csim (c++)
   // will not match the data generated during cosim (verilog)
 
   // Set random generator range for Vp
   std::default_random_engine gen{0xdeadbeef};
-  std::uniform_real_distribution<> dist(0, pow(2, (OUTPUT_INTEGER-1)));
+  std::uniform_real_distribution<> dist(0, pow(2, (SIGGEN_OUTPUT_INTEGER-1)));
 
   // Set random generator range for RadiansPerSample
   std::uniform_real_distribution<> dist2(0, 6.283f);

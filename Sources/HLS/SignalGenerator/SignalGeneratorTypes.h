@@ -1,13 +1,13 @@
 #ifndef __SIGNALGENERATORTYPES_H__
 #define __SIGNALGENERATORTYPES_H__
 
-#define OUTPUT_WIDTH   16
-#define OUTPUT_INTEGER 4  // Integer portion of SignalGenerator output data type.
-                          // OUTPUT_INTEGER includes the sign, so the value range
-                          // is -2^(OUTPUT_INTEGER-1) to 2^(OUTPUT_INTEGER-1)
+#define SIGGEN_OUTPUT_WIDTH   16
+#define SIGGEN_OUTPUT_INTEGER 4   // Integer portion of SignalGenerator output data type.
+                                  // SIGGEN_OUTPUT_INTEGER includes the sign, so the value range
+                                  // is -2^(SIGGEN_OUTPUT_INTEGER-1) to 2^(SIGGEN_OUTPUT_INTEGER-1)
 
-typedef ap_fixed<OUTPUT_WIDTH, OUTPUT_INTEGER> OutputT;
-typedef hls::axis<OutputT,0,0,0> OutputAXIS;
+typedef ap_fixed<SIGGEN_OUTPUT_WIDTH, SIGGEN_OUTPUT_INTEGER> SigGenOutputT;
+typedef hls::axis<SigGenOutputT,0,0,0> SigGenOutputAXIS;
 
 template<typename Tf, typename T1>
 struct SignalGeneratorControlRegistersT

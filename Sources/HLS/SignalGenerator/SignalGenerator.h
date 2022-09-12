@@ -13,16 +13,16 @@
 #define RADIAN_SREG_LENGTH  2
 #define FRAMESIZE           16
 
-void SignalGeneratorSyn(SignalGeneratorControlRegistersT<OutputT,ap_uint<1> >* Control, hls::stream<OutputAXIS>& Output);
+void SignalGeneratorSyn(SignalGeneratorControlRegistersT<SigGenOutputT,ap_uint<1> >* Control, hls::stream<SigGenOutputAXIS>& Output);
 
 class SignalGenerator
 {
   public:
     SignalGenerator();
-    void CalculateNextSample(SignalGeneratorControlRegistersT<OutputT,ap_uint<1> >* Control, hls::stream<OutputAXIS>& Output);
+    void CalculateNextSample(SignalGeneratorControlRegistersT<SigGenOutputT,ap_uint<1> >* Control, hls::stream<SigGenOutputAXIS>& Output);
 
   private:
-    OutputT RadianShiftRegister[RADIAN_SREG_LENGTH];
+    SigGenOutputT RadianShiftRegister[RADIAN_SREG_LENGTH];
 };
 
 #endif
