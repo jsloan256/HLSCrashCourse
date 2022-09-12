@@ -15,7 +15,7 @@ csynth_design
 
 cosim_design -rtl verilog -trace_level all
 
-export_design -rtl verilog -format ip_catalog -description "Signal generator" -vendor "tsc.com" -version "1.01" -display_name "Multiplier"
+export_design -rtl verilog -format ip_catalog -description "AXI-Stream multiplier" -vendor "tsc.com" -version "1.01" -display_name "Multiplier"
 
 close_solution
 close_project

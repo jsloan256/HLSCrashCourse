@@ -14,7 +14,7 @@ csynth_design
 
 cosim_design -rtl verilog -trace_level none
 
-export_design -rtl verilog -format ip_catalog -description "Simple GPIO" -vendor "jsloan256-on-github" -version "1.01" -display_name "Simple GPIO"
+export_design -rtl verilog -format ip_catalog -description "AXI-Slave controlller for DSP cores" -vendor "jsloan256-on-github" -version "1.01" -display_name "Stream controller"
 
 close_solution
 close_project

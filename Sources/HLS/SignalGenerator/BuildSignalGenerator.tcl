@@ -15,7 +15,7 @@ csynth_design
 
 cosim_design -rtl verilog -trace_level all
 
-export_design -rtl verilog -format ip_catalog -description "Signal generator" -vendor "tsc.com" -version "1.01" -display_name "SignalGenerator"
+export_design -rtl verilog -format ip_catalog -description "AXI-Stream signal generator" -vendor "tsc.com" -version "1.01" -display_name "SignalGenerator"
 
 close_solution
 close_project

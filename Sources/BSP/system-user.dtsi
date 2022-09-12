@@ -15,3 +15,6 @@
 	compatible = "generic-uio";
 };
 
+&SignalGenerator_StreamControlSyn_0 {
+	compatible = "generic-uio";
+};

@@ -9,10 +9,12 @@
 typedef ap_fixed<SIGGEN_OUTPUT_WIDTH, SIGGEN_OUTPUT_INTEGER> SigGenOutputT;
 typedef hls::axis<SigGenOutputT,0,0,0> SigGenOutputAXIS;
 
-template<typename Tf, typename T1>
+typedef ap_fixed<32, 4> RadiansT;
+
+template<typename Tr, typename Tf, typename T1>
 struct SignalGeneratorControlRegistersT
 {
-  Tf RadiansPerSample;
+  Tr RadiansPerSample;
   Tf Vp;
   T1 StartSG;
 };

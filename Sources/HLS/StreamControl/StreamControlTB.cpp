@@ -1,6 +1,6 @@
 #include "StreamControl.h"
 
-#define SIMULATION_LENGTH 128
+#define SIMULATION_ITERATIONS 128
 
 int main()
 {
@@ -8,11 +8,11 @@ int main()
   int err = 0;
   float OutputResolution = pow(2, -(SIGGEN_OUTPUT_WIDTH - SIGGEN_OUTPUT_INTEGER));
 
-  SignalGeneratorControlRegistersT<float, uint32_t> AXI4Control1;
-  SignalGeneratorControlRegistersT<SigGenOutputT, ap_uint<1> > Control1;
+  SignalGeneratorControlRegistersT<float, float, uint32_t> AXI4Control1;
+  SignalGeneratorControlRegistersT<RadiansT, SigGenOutputT, ap_uint<1> > Control1;
 
-  SignalGeneratorControlRegistersT<float, uint32_t> AXI4Control2;
-  SignalGeneratorControlRegistersT<SigGenOutputT, ap_uint<1> > Control2;
+  SignalGeneratorControlRegistersT<float, float, uint32_t> AXI4Control2;
+  SignalGeneratorControlRegistersT<RadiansT, SigGenOutputT, ap_uint<1> > Control2;
 
   // A fixed seed is REQUIRED. If you don't provide one the reference data generated during csim (c++)
   // will not match the data generated during cosim (verilog)
@@ -27,7 +27,7 @@ int main()
   // Set random generator range for StartSG
   std::uniform_real_distribution<> dist3(0, 1.999f);
 
-  for (i=0; i<SIMULATION_LENGTH; i++)
+  for (i=0; i<SIMULATION_ITERATIONS; i++)
   {
     // Use random values for each Signal Generator #1 control register
     AXI4Control1.Vp = dist(gen);

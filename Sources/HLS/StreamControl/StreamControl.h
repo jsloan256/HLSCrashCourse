@@ -10,7 +10,7 @@
 
 #include "../SignalGenerator/SignalGeneratorTypes.h"
 
-void StreamControlSyn(SignalGeneratorControlRegistersT<float, uint32_t>* AXI4Control1, SignalGeneratorControlRegistersT<SigGenOutputT, ap_uint<1> >* Control1,
-                      SignalGeneratorControlRegistersT<float, uint32_t>* AXI4Control2, SignalGeneratorControlRegistersT<SigGenOutputT, ap_uint<1> >* Control2);
+void StreamControlSyn(SignalGeneratorControlRegistersT<float, float, uint32_t>* AXI4Control1, SignalGeneratorControlRegistersT<RadiansT, SigGenOutputT, ap_uint<1> >* Control1,
+                      SignalGeneratorControlRegistersT<float, float, uint32_t>* AXI4Control2, SignalGeneratorControlRegistersT<RadiansT, SigGenOutputT, ap_uint<1> >* Control2);
 
 #endif
