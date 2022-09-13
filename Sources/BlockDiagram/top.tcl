@@ -341,7 +341,13 @@ proc create_hier_cell_SignalGenerator { parentCell nameHier } {
   # Create instance: SignalGeneratorILA, and set properties
   set SignalGeneratorILA [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.1 SignalGeneratorILA ]
   set_property -dict [ list \
+   CONFIG.C_MON_TYPE {MIX} \
+   CONFIG.C_NUM_MONITOR_SLOTS {3} \
+   CONFIG.C_NUM_OF_PROBES {4} \
+   CONFIG.C_SLOT {2} \
    CONFIG.C_SLOT_0_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
+   CONFIG.C_SLOT_1_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
+   CONFIG.C_SLOT_2_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
  ] $SignalGeneratorILA
 
   # Create instance: SignalGeneratorSyn_0, and set properties
@@ -356,12 +362,6 @@ proc create_hier_cell_SignalGenerator { parentCell nameHier } {
   # Create instance: xlconstant_0, and set properties
   set xlconstant_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_0 ]
 
-  # Create instance: xlconstant_1, and set properties
-  set xlconstant_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_1 ]
-
-  # Create instance: xlconstant_2, and set properties
-  set xlconstant_2 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_2 ]
-
   # Create instance: xlconstant_3, and set properties
   set xlconstant_3 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_3 ]
 
@@ -369,25 +369,25 @@ proc create_hier_cell_SignalGenerator { parentCell nameHier } {
   set xlconstant_4 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_4 ]
 
   # Create interface connections
-  connect_bd_intf_net -intf_net MultiplierSyn_0_Output_r [get_bd_intf_pins MultiplierSyn_0/Output_r] [get_bd_intf_pins SignalGeneratorILA/SLOT_0_AXIS]
+  connect_bd_intf_net -intf_net MultiplierSyn_0_Output_r [get_bd_intf_pins MultiplierSyn_0/Output_r] [get_bd_intf_pins SignalGeneratorILA/SLOT_2_AXIS]
   connect_bd_intf_net -intf_net SignalGeneratorSyn_0_Output_r [get_bd_intf_pins MultiplierSyn_0/Input1] [get_bd_intf_pins SignalGeneratorSyn_0/Output_r]
+  connect_bd_intf_net -intf_net [get_bd_intf_nets SignalGeneratorSyn_0_Output_r] [get_bd_intf_pins MultiplierSyn_0/Input1] [get_bd_intf_pins SignalGeneratorILA/SLOT_0_AXIS]
   connect_bd_intf_net -intf_net SignalGeneratorSyn_1_Output_r [get_bd_intf_pins MultiplierSyn_0/Input2] [get_bd_intf_pins SignalGeneratorSyn_1/Output_r]
+  connect_bd_intf_net -intf_net [get_bd_intf_nets SignalGeneratorSyn_1_Output_r] [get_bd_intf_pins MultiplierSyn_0/Input2] [get_bd_intf_pins SignalGeneratorILA/SLOT_1_AXIS]
   connect_bd_intf_net -intf_net smartconnect_0_M01_AXI [get_bd_intf_pins s_axi_AXI4Bus] [get_bd_intf_pins StreamControlSyn_0/s_axi_AXI4Bus]
 
   # Create port connections
-  connect_bd_net -net StreamControlSyn_0_Control1_RadiansPerSample [get_bd_pins SignalGeneratorSyn_0/Control_RadiansPerSample] [get_bd_pins StreamControlSyn_0/Control1_RadiansPerSample]
-  connect_bd_net -net StreamControlSyn_0_Control1_StartSG [get_bd_pins SignalGeneratorSyn_0/Control_StartSG] [get_bd_pins StreamControlSyn_0/Control1_StartSG]
-  connect_bd_net -net StreamControlSyn_0_Control1_Vp [get_bd_pins SignalGeneratorSyn_0/Control_Vp] [get_bd_pins StreamControlSyn_0/Control1_Vp]
+  connect_bd_net -net Net [get_bd_pins MultiplierSyn_0/Output_r_TREADY] [get_bd_pins SignalGeneratorILA/SLOT_2_AXIS_tready] [get_bd_pins xlconstant_4/dout]
+  connect_bd_net -net StreamControlSyn_0_Control1_RadiansPerSample [get_bd_pins SignalGeneratorILA/probe0] [get_bd_pins SignalGeneratorSyn_0/Control_RadiansPerSample] [get_bd_pins StreamControlSyn_0/Control1_RadiansPerSample]
+  connect_bd_net -net StreamControlSyn_0_Control1_StartSG [get_bd_pins SignalGeneratorILA/probe2] [get_bd_pins SignalGeneratorSyn_0/Control_StartSG] [get_bd_pins SignalGeneratorSyn_0/ap_start] [get_bd_pins StreamControlSyn_0/Control1_StartSG]
+  connect_bd_net -net StreamControlSyn_0_Control1_Vp [get_bd_pins SignalGeneratorILA/probe1] [get_bd_pins SignalGeneratorSyn_0/Control_Vp] [get_bd_pins StreamControlSyn_0/Control1_Vp]
   connect_bd_net -net StreamControlSyn_0_Control2_RadiansPerSample [get_bd_pins SignalGeneratorSyn_1/Control_RadiansPerSample] [get_bd_pins StreamControlSyn_0/Control2_RadiansPerSample]
-  connect_bd_net -net StreamControlSyn_0_Control2_StartSG [get_bd_pins SignalGeneratorSyn_1/Control_StartSG] [get_bd_pins StreamControlSyn_0/Control2_StartSG]
+  connect_bd_net -net StreamControlSyn_0_Control2_StartSG [get_bd_pins SignalGeneratorSyn_1/Control_StartSG] [get_bd_pins SignalGeneratorSyn_1/ap_start] [get_bd_pins StreamControlSyn_0/Control2_StartSG]
   connect_bd_net -net StreamControlSyn_0_Control2_Vp [get_bd_pins SignalGeneratorSyn_1/Control_Vp] [get_bd_pins StreamControlSyn_0/Control2_Vp]
   connect_bd_net -net ap_clk1_1 [get_bd_pins axi4_clk] [get_bd_pins MultiplierSyn_0/ap_clk] [get_bd_pins SignalGeneratorILA/clk] [get_bd_pins SignalGeneratorSyn_0/ap_clk] [get_bd_pins SignalGeneratorSyn_1/ap_clk] [get_bd_pins StreamControlSyn_0/ap_clk]
   connect_bd_net -net ap_rst_n1_1 [get_bd_pins axi4_prstn] [get_bd_pins MultiplierSyn_0/ap_rst_n] [get_bd_pins SignalGeneratorILA/resetn] [get_bd_pins SignalGeneratorSyn_0/ap_rst_n] [get_bd_pins SignalGeneratorSyn_1/ap_rst_n] [get_bd_pins StreamControlSyn_0/ap_rst_n]
   connect_bd_net -net xlconstant_0_dout [get_bd_pins StreamControlSyn_0/ap_start] [get_bd_pins xlconstant_0/dout]
-  connect_bd_net -net xlconstant_1_dout [get_bd_pins SignalGeneratorSyn_0/ap_start] [get_bd_pins xlconstant_1/dout]
-  connect_bd_net -net xlconstant_2_dout [get_bd_pins SignalGeneratorSyn_1/ap_start] [get_bd_pins xlconstant_2/dout]
   connect_bd_net -net xlconstant_3_dout [get_bd_pins MultiplierSyn_0/ap_start] [get_bd_pins xlconstant_3/dout]
-  connect_bd_net -net xlconstant_4_dout [get_bd_pins MultiplierSyn_0/Output_r_TREADY] [get_bd_pins SignalGeneratorILA/SLOT_0_AXIS_tready] [get_bd_pins xlconstant_4/dout]
 
   # Restore current instance
   current_bd_instance $oldCurInst

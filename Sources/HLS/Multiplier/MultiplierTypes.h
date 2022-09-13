@@ -11,7 +11,7 @@ typedef hls::axis<MultInputT,0,0,0> MultInputAXIS;
 
 // Let HLS calculate the correct output bit width (and number of integer bits) based on
 // the input type sizes and the operation to be performed
-typedef typename hls::x_traits<MultInputT, MultInputT>::ADD_T MultOutputT;
+typedef typename hls::x_traits<MultInputT, MultInputT>::MULT_T MultOutputT;
 typedef hls::axis<MultOutputT,0,0,0> MultOutputAXIS;
 
 #endif

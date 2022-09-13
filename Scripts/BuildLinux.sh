@@ -18,15 +18,15 @@ cp ../Sources/HLS/SimpleGpio/ExampleDriver/src/* project-spec/meta-user/recipes-
 cp ../Sources/HLS/SimpleGpio/SimpleGpioProject/Solution/impl/ip/drivers/SimpleGpioSyn_v1_01/src/*.c project-spec/meta-user/recipes-apps/simplegpio-example/files/.
 cp ../Sources/HLS/SimpleGpio/SimpleGpioProject/Solution/impl/ip/drivers/SimpleGpioSyn_v1_01/src/*.h project-spec/meta-user/recipes-apps/simplegpio-example/files/.
 
-#-# # Create stream-example application using my source
-#-# petalinux-create -t apps --template c++ --name stream-example --enable
-#-# # Copy application bitbake file
-#-# cp ../Sources/HLS/StreamControl/ExampleDriver/stream-example.bb project-spec/meta-user/recipes-apps/stream-example/.
-#-# # Copy main application code
-#-# cp ../Sources/HLS/StreamControl/ExampleDriver/src/* project-spec/meta-user/recipes-apps/stream-example/files/.
-#-# # Copy HLS prebuilt drivers from compiled core project
-#-# cp ../Sources/HLS/StreamControl/StreamControlProject/Solution/impl/ip/drivers/StreamControlSyn_v1_01/src/*.c project-spec/meta-user/recipes-apps/stream-example/files/.
-#-# cp ../Sources/HLS/StreamControl/StreamControlProject/Solution/impl/ip/drivers/StreamControlSyn_v1_01/src/*.h project-spec/meta-user/recipes-apps/stream-example/files/.
+# Create stream-example application using my source
+petalinux-create -t apps --template c++ --name stream-example --enable
+# Copy application bitbake file
+cp ../Sources/HLS/StreamControl/ExampleDriver/stream-example.bb project-spec/meta-user/recipes-apps/stream-example/.
+# Copy main application code
+cp ../Sources/HLS/StreamControl/ExampleDriver/src/* project-spec/meta-user/recipes-apps/stream-example/files/.
+# Copy HLS prebuilt drivers from compiled core project
+cp ../Sources/HLS/StreamControl/StreamControlProject/Solution/impl/ip/drivers/StreamControlSyn_v1_01/src/*.c project-spec/meta-user/recipes-apps/stream-example/files/.
+cp ../Sources/HLS/StreamControl/StreamControlProject/Solution/impl/ip/drivers/StreamControlSyn_v1_01/src/*.h project-spec/meta-user/recipes-apps/stream-example/files/.
 
 # Update BSP meta layer
 cp ../Sources/BSP/system-user.dtsi project-spec/meta-user/recipes-bsp/device-tree/files/.

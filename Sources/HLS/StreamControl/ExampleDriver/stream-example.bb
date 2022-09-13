@@ -8,10 +8,10 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 SRC_URI = "file://stream-example.cpp \
-           file://streamcontrolsyn.c \
-           file://streamcontrolsyn_linux.c \
-           file://streamcontrolsyn.h \
-           file://streamcontrolsyn_hw.h \
+           file://xstreamcontrolsyn.c \
+           file://xstreamcontrolsyn_linux.c \
+           file://xstreamcontrolsyn.h \
+           file://xstreamcontrolsyn_hw.h \
            file://Makefile \
 		  "
 

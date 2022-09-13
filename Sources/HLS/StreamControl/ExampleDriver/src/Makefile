@@ -1,7 +1,7 @@
 APP = stream-example
 
 # Add any other object files to this list below
-APP_OBJS = stream-example.o streamcontrolsyn.o streamcontrolsyn_linux.o
+APP_OBJS = stream-example.o xstreamcontrolsyn.o xstreamcontrolsyn_linux.o
 
 all: build
 
