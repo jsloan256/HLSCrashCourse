@@ -341,7 +341,7 @@ proc create_hier_cell_SignalGenerator { parentCell nameHier } {
   # Create instance: SignalGeneratorILA, and set properties
   set SignalGeneratorILA [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.1 SignalGeneratorILA ]
   set_property -dict [ list \
-   CONFIG.C_MON_TYPE {MIX} \
+   CONFIG.C_MON_TYPE {INTERFACE} \
    CONFIG.C_NUM_MONITOR_SLOTS {3} \
    CONFIG.C_NUM_OF_PROBES {4} \
    CONFIG.C_SLOT {2} \
@@ -378,9 +378,9 @@ proc create_hier_cell_SignalGenerator { parentCell nameHier } {
 
   # Create port connections
   connect_bd_net -net Net [get_bd_pins MultiplierSyn_0/Output_r_TREADY] [get_bd_pins SignalGeneratorILA/SLOT_2_AXIS_tready] [get_bd_pins xlconstant_4/dout]
-  connect_bd_net -net StreamControlSyn_0_Control1_RadiansPerSample [get_bd_pins SignalGeneratorILA/probe0] [get_bd_pins SignalGeneratorSyn_0/Control_RadiansPerSample] [get_bd_pins StreamControlSyn_0/Control1_RadiansPerSample]
-  connect_bd_net -net StreamControlSyn_0_Control1_StartSG [get_bd_pins SignalGeneratorILA/probe2] [get_bd_pins SignalGeneratorSyn_0/Control_StartSG] [get_bd_pins SignalGeneratorSyn_0/ap_start] [get_bd_pins StreamControlSyn_0/Control1_StartSG]
-  connect_bd_net -net StreamControlSyn_0_Control1_Vp [get_bd_pins SignalGeneratorILA/probe1] [get_bd_pins SignalGeneratorSyn_0/Control_Vp] [get_bd_pins StreamControlSyn_0/Control1_Vp]
+  connect_bd_net -net StreamControlSyn_0_Control1_RadiansPerSample [get_bd_pins SignalGeneratorSyn_0/Control_RadiansPerSample] [get_bd_pins StreamControlSyn_0/Control1_RadiansPerSample]
+  connect_bd_net -net StreamControlSyn_0_Control1_StartSG [get_bd_pins SignalGeneratorSyn_0/Control_StartSG] [get_bd_pins SignalGeneratorSyn_0/ap_start] [get_bd_pins StreamControlSyn_0/Control1_StartSG]
+  connect_bd_net -net StreamControlSyn_0_Control1_Vp [get_bd_pins SignalGeneratorSyn_0/Control_Vp] [get_bd_pins StreamControlSyn_0/Control1_Vp]
   connect_bd_net -net StreamControlSyn_0_Control2_RadiansPerSample [get_bd_pins SignalGeneratorSyn_1/Control_RadiansPerSample] [get_bd_pins StreamControlSyn_0/Control2_RadiansPerSample]
   connect_bd_net -net StreamControlSyn_0_Control2_StartSG [get_bd_pins SignalGeneratorSyn_1/Control_StartSG] [get_bd_pins SignalGeneratorSyn_1/ap_start] [get_bd_pins StreamControlSyn_0/Control2_StartSG]
   connect_bd_net -net StreamControlSyn_0_Control2_Vp [get_bd_pins SignalGeneratorSyn_1/Control_Vp] [get_bd_pins StreamControlSyn_0/Control2_Vp]
