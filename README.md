@@ -42,7 +42,7 @@ After generating the bitstream and exporting the XSA in Vivado:
 * Run: `Scripts$ ./BuildLinux.sh`
 
 ## Install Linux to SD card
-Verify that JP2 is installed. Connect the SD card to your PC and find its mount point (often /dev/sda, /dev/sdb, etc.) **BE CAREFUL, THE FOLLOWING COMMANDS WILL WIPE YOUR HARDDRIVE IF YOU SPECIFY THE WRONG /dev/sdX location.**
+Verify that JP2 is installed. Connect the SD card to your PC and find its mount point (often /dev/sda, /dev/sdb, etc.) **BE CAREFUL, THE FOLLOWING COMMANDS WILL WIPE YOUR HARDDRIVE IF YOU SPECIFY THE WRONG /dev/sdX LOCATION.**
 
 Run
 * `HCCLinux$ ../Scripts/PartitionSDCard /dev/sdX`
