@@ -38,4 +38,4 @@ write_hw_platform -fixed -include_bit -force -file $ExportFolder/top_wrapper.xsa
 if {[file exists $ExportFolder/top_wrapper.xsa] == 0} {
   error "ERROR: Failed to generate XSA"
 }
-puts "Successfully generated the XSA (WNS = ${ImplementationWNS}, WHS =${ImplementationWHS})"
+puts "Successfully generated the XSA (WNS = ${ImplementationWNS}, WHS = ${ImplementationWHS})"

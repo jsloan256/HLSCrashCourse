@@ -7,3 +7,6 @@ platform generate;
 app create -name simplegpio-example -platform HCCPlatform -os linux -lang c++ -template "Empty Application (C++)";
 app build simplegpio-example;
 
+app create -name stream-example -platform HCCPlatform -os linux -lang c++ -template "Empty Application (C++)";
+app build stream-example;
+

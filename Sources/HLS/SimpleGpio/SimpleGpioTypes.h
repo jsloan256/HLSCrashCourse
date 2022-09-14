@@ -1,5 +1,5 @@
-#ifndef __SIMPLEGPIOIFSTRUCTS_H__
-#define __SIMPLEGPIOIFSTRUCTS_H__
+#ifndef __SIMPLEGPIOIFTYPES_H__
+#define __SIMPLEGPIOIFTYPES_H__
 
 struct SimpleGpioControlRegistersT
 {

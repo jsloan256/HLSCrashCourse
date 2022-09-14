@@ -1,0 +1,27 @@
+#
+# This file is the simplegpio-example recipe.
+#
+
+SUMMARY = "Controller application for SignalGenerator and Multiplier AXI-Stream cores"
+SECTION = "PETALINUX/apps"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+
+SRC_URI = "file://stream-example.cpp \
+           file://xstreamcontrolsyn.c \
+           file://xstreamcontrolsyn_linux.c \
+           file://xstreamcontrolsyn.h \
+           file://xstreamcontrolsyn_hw.h \
+           file://Makefile \
+		  "
+
+S = "${WORKDIR}"
+
+do_compile() {
+	     oe_runmake
+}
+
+do_install() {
+	     install -d ${D}${bindir}
+	     install -m 0755 stream-example ${D}${bindir}
+}

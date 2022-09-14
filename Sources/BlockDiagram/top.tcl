@@ -125,9 +125,13 @@ xilinx.com:ip:processing_system7:5.5\
 xilinx.com:ip:smartconnect:1.0\
 xilinx.com:ip:proc_sys_reset:5.0\
 xilinx.com:ip:clk_wiz:6.0\
+tsc.com:hls:MultiplierSyn:1.01\
+xilinx.com:ip:system_ila:1.1\
+tsc.com:hls:SignalGeneratorSyn:1.01\
+jsloan256-on-github:hls:StreamControlSyn:1.01\
+xilinx.com:ip:xlconstant:1.1\
 jsloan256-on-github:hls:SimpleGpioSyn:1.01\
 xilinx.com:ip:vio:3.0\
-xilinx.com:ip:xlconstant:1.1\
 xilinx.com:ip:xlslice:1.0\
 "
 
@@ -289,6 +293,106 @@ proc create_hier_cell_SimpleGpio { parentCell nameHier } {
   current_bd_instance $oldCurInst
 }
 
+# Hierarchical cell: SignalGenerator
+proc create_hier_cell_SignalGenerator { parentCell nameHier } {
+
+  variable script_folder
+
+  if { $parentCell eq "" || $nameHier eq "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2092 -severity "ERROR" "create_hier_cell_SignalGenerator() - Empty argument(s)!"}
+     return
+  }
+
+  # Get object for parentCell
+  set parentObj [get_bd_cells $parentCell]
+  if { $parentObj == "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2090 -severity "ERROR" "Unable to find parent cell <$parentCell>!"}
+     return
+  }
+
+  # Make sure parentObj is hier blk
+  set parentType [get_property TYPE $parentObj]
+  if { $parentType ne "hier" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2091 -severity "ERROR" "Parent <$parentObj> has TYPE = <$parentType>. Expected to be <hier>."}
+     return
+  }
+
+  # Save current instance; Restore later
+  set oldCurInst [current_bd_instance .]
+
+  # Set parent object as current
+  current_bd_instance $parentObj
+
+  # Create cell and set as current instance
+  set hier_obj [create_bd_cell -type hier $nameHier]
+  current_bd_instance $hier_obj
+
+  # Create interface pins
+  create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 s_axi_AXI4Bus
+
+
+  # Create pins
+  create_bd_pin -dir I -type clk axi4_clk
+  create_bd_pin -dir I -type rst axi4_prstn
+
+  # Create instance: MultiplierSyn_0, and set properties
+  set MultiplierSyn_0 [ create_bd_cell -type ip -vlnv tsc.com:hls:MultiplierSyn:1.01 MultiplierSyn_0 ]
+
+  # Create instance: SignalGeneratorILA, and set properties
+  set SignalGeneratorILA [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.1 SignalGeneratorILA ]
+  set_property -dict [ list \
+   CONFIG.C_MON_TYPE {INTERFACE} \
+   CONFIG.C_NUM_MONITOR_SLOTS {3} \
+   CONFIG.C_NUM_OF_PROBES {4} \
+   CONFIG.C_SLOT {2} \
+   CONFIG.C_SLOT_0_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
+   CONFIG.C_SLOT_1_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
+   CONFIG.C_SLOT_2_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
+ ] $SignalGeneratorILA
+
+  # Create instance: SignalGeneratorSyn_0, and set properties
+  set SignalGeneratorSyn_0 [ create_bd_cell -type ip -vlnv tsc.com:hls:SignalGeneratorSyn:1.01 SignalGeneratorSyn_0 ]
+
+  # Create instance: SignalGeneratorSyn_1, and set properties
+  set SignalGeneratorSyn_1 [ create_bd_cell -type ip -vlnv tsc.com:hls:SignalGeneratorSyn:1.01 SignalGeneratorSyn_1 ]
+
+  # Create instance: StreamControlSyn_0, and set properties
+  set StreamControlSyn_0 [ create_bd_cell -type ip -vlnv jsloan256-on-github:hls:StreamControlSyn:1.01 StreamControlSyn_0 ]
+
+  # Create instance: xlconstant_0, and set properties
+  set xlconstant_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_0 ]
+
+  # Create instance: xlconstant_3, and set properties
+  set xlconstant_3 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_3 ]
+
+  # Create instance: xlconstant_4, and set properties
+  set xlconstant_4 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_4 ]
+
+  # Create interface connections
+  connect_bd_intf_net -intf_net MultiplierSyn_0_Output_r [get_bd_intf_pins MultiplierSyn_0/Output_r] [get_bd_intf_pins SignalGeneratorILA/SLOT_2_AXIS]
+  connect_bd_intf_net -intf_net SignalGeneratorSyn_0_Output_r [get_bd_intf_pins MultiplierSyn_0/Input1] [get_bd_intf_pins SignalGeneratorSyn_0/Output_r]
+  connect_bd_intf_net -intf_net [get_bd_intf_nets SignalGeneratorSyn_0_Output_r] [get_bd_intf_pins MultiplierSyn_0/Input1] [get_bd_intf_pins SignalGeneratorILA/SLOT_0_AXIS]
+  connect_bd_intf_net -intf_net SignalGeneratorSyn_1_Output_r [get_bd_intf_pins MultiplierSyn_0/Input2] [get_bd_intf_pins SignalGeneratorSyn_1/Output_r]
+  connect_bd_intf_net -intf_net [get_bd_intf_nets SignalGeneratorSyn_1_Output_r] [get_bd_intf_pins MultiplierSyn_0/Input2] [get_bd_intf_pins SignalGeneratorILA/SLOT_1_AXIS]
+  connect_bd_intf_net -intf_net smartconnect_0_M01_AXI [get_bd_intf_pins s_axi_AXI4Bus] [get_bd_intf_pins StreamControlSyn_0/s_axi_AXI4Bus]
+
+  # Create port connections
+  connect_bd_net -net Net [get_bd_pins MultiplierSyn_0/Output_r_TREADY] [get_bd_pins SignalGeneratorILA/SLOT_2_AXIS_tready] [get_bd_pins xlconstant_4/dout]
+  connect_bd_net -net StreamControlSyn_0_Control1_RadiansPerSample [get_bd_pins SignalGeneratorSyn_0/Control_RadiansPerSample] [get_bd_pins StreamControlSyn_0/Control1_RadiansPerSample]
+  connect_bd_net -net StreamControlSyn_0_Control1_StartSG [get_bd_pins SignalGeneratorSyn_0/Control_StartSG] [get_bd_pins SignalGeneratorSyn_0/ap_start] [get_bd_pins StreamControlSyn_0/Control1_StartSG]
+  connect_bd_net -net StreamControlSyn_0_Control1_Vp [get_bd_pins SignalGeneratorSyn_0/Control_Vp] [get_bd_pins StreamControlSyn_0/Control1_Vp]
+  connect_bd_net -net StreamControlSyn_0_Control2_RadiansPerSample [get_bd_pins SignalGeneratorSyn_1/Control_RadiansPerSample] [get_bd_pins StreamControlSyn_0/Control2_RadiansPerSample]
+  connect_bd_net -net StreamControlSyn_0_Control2_StartSG [get_bd_pins SignalGeneratorSyn_1/Control_StartSG] [get_bd_pins SignalGeneratorSyn_1/ap_start] [get_bd_pins StreamControlSyn_0/Control2_StartSG]
+  connect_bd_net -net StreamControlSyn_0_Control2_Vp [get_bd_pins SignalGeneratorSyn_1/Control_Vp] [get_bd_pins StreamControlSyn_0/Control2_Vp]
+  connect_bd_net -net ap_clk1_1 [get_bd_pins axi4_clk] [get_bd_pins MultiplierSyn_0/ap_clk] [get_bd_pins SignalGeneratorILA/clk] [get_bd_pins SignalGeneratorSyn_0/ap_clk] [get_bd_pins SignalGeneratorSyn_1/ap_clk] [get_bd_pins StreamControlSyn_0/ap_clk]
+  connect_bd_net -net ap_rst_n1_1 [get_bd_pins axi4_prstn] [get_bd_pins MultiplierSyn_0/ap_rst_n] [get_bd_pins SignalGeneratorILA/resetn] [get_bd_pins SignalGeneratorSyn_0/ap_rst_n] [get_bd_pins SignalGeneratorSyn_1/ap_rst_n] [get_bd_pins StreamControlSyn_0/ap_rst_n]
+  connect_bd_net -net xlconstant_0_dout [get_bd_pins StreamControlSyn_0/ap_start] [get_bd_pins xlconstant_0/dout]
+  connect_bd_net -net xlconstant_3_dout [get_bd_pins MultiplierSyn_0/ap_start] [get_bd_pins xlconstant_3/dout]
+
+  # Restore current instance
+  current_bd_instance $oldCurInst
+}
+
 # Hierarchical cell: ClockAndReset
 proc create_hier_cell_ClockAndReset { parentCell nameHier } {
 
@@ -433,6 +537,9 @@ proc create_root_design { parentCell } {
 
   # Create instance: ClockAndReset
   create_hier_cell_ClockAndReset [current_bd_instance .] ClockAndReset
+
+  # Create instance: SignalGenerator
+  create_hier_cell_SignalGenerator [current_bd_instance .] SignalGenerator
 
   # Create instance: SimpleGpio
   create_hier_cell_SimpleGpio [current_bd_instance .] SimpleGpio
@@ -1248,8 +1355,8 @@ gpio[0]#gpio[1]#gpio[2]#gpio[3]#gpio[4]#gpio[5]#gpio[6]#gpio[7]#gpio[8]#reset#gp
   # Create instance: smartconnect_0, and set properties
   set smartconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 smartconnect_0 ]
   set_property -dict [ list \
-   CONFIG.NUM_CLKS {2} \
-   CONFIG.NUM_MI {1} \
+   CONFIG.NUM_CLKS {1} \
+   CONFIG.NUM_MI {2} \
    CONFIG.NUM_SI {1} \
  ] $smartconnect_0
 
@@ -1258,12 +1365,12 @@ gpio[0]#gpio[1]#gpio[2]#gpio[3]#gpio[4]#gpio[5]#gpio[6]#gpio[7]#gpio[8]#reset#gp
   connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins processing_system7_0/FIXED_IO]
   connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins processing_system7_0/M_AXI_GP0] [get_bd_intf_pins smartconnect_0/S00_AXI]
   connect_bd_intf_net -intf_net smartconnect_0_M00_AXI [get_bd_intf_pins SimpleGpio/s_axi_AXI4Bus] [get_bd_intf_pins smartconnect_0/M00_AXI]
+  connect_bd_intf_net -intf_net smartconnect_0_M01_AXI [get_bd_intf_pins SignalGenerator/s_axi_AXI4Bus] [get_bd_intf_pins smartconnect_0/M01_AXI]
 
   # Create port connections
-  connect_bd_net -net ClockAndReset_peripheral_aresetn [get_bd_pins ClockAndReset/axi4_prstn] [get_bd_pins SimpleGpio/ap_rst_n]
-  connect_bd_net -net axi4_clk [get_bd_pins ClockAndReset/axi4_clk] [get_bd_pins SimpleGpio/ap_clk] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] [get_bd_pins smartconnect_0/aclk]
+  connect_bd_net -net axi4_clk [get_bd_pins ClockAndReset/axi4_clk] [get_bd_pins SignalGenerator/axi4_clk] [get_bd_pins SimpleGpio/ap_clk] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] [get_bd_pins smartconnect_0/aclk]
   connect_bd_net -net axi4_irstn [get_bd_pins ClockAndReset/axi4_irstn] [get_bd_pins smartconnect_0/aresetn]
-  connect_bd_net -net axis_clk [get_bd_pins ClockAndReset/axis_clk] [get_bd_pins smartconnect_0/aclk1]
+  connect_bd_net -net axi4_prstn [get_bd_pins ClockAndReset/axi4_prstn] [get_bd_pins SignalGenerator/axi4_prstn] [get_bd_pins SimpleGpio/ap_rst_n]
   connect_bd_net -net processing_system7_0_FCLK_RESET0_N [get_bd_pins ClockAndReset/ext_reset_in] [get_bd_pins processing_system7_0/FCLK_RESET0_N]
   connect_bd_net -net sys_clock_1 [get_bd_ports sys_clock] [get_bd_pins ClockAndReset/sys_clock]
   connect_bd_net -net xlslice_0dt0_Dout [get_bd_ports led0_r] [get_bd_pins SimpleGpio/led0_r]
@@ -1275,6 +1382,7 @@ gpio[0]#gpio[1]#gpio[2]#gpio[3]#gpio[4]#gpio[5]#gpio[6]#gpio[7]#gpio[8]#reset#gp
 
   # Create address segments
   assign_bd_address -offset 0x40000000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs SimpleGpio/SimpleGpioSyn_0/s_axi_AXI4Bus/Reg] -force
+  assign_bd_address -offset 0x40010000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs SignalGenerator/StreamControlSyn_0/s_axi_AXI4Bus/Reg] -force
 
 
   # Restore current instance
