@@ -33,7 +33,7 @@ Perform the following steps to regenerate the Vivado top-level project as well a
 ## SimpleGpio Hierarchy Block Diagram
 ![SimpleGPIO Hierarchy Block](SimpleGPIOHierarchyBlock.png)
 
-## SignalGeneratr Hierarchy Block Diagram
+## SignalGenerator Hierarchy Block Diagram
 ![SignalGenerator Hierarchy Block](SignalGeneratorHierarchyBlock.png)
 
 # Building Linux
